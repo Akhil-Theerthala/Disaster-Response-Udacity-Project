@@ -23,7 +23,7 @@ from sklearn.metrics import classification_report, confusion_matrix, r2_score
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.naive_bayes import MultinomialNB
 
-
+sklearn.ensemble.GradientBoostingClassifer(verbose=1)
 
 def load_data(database_filepath):
     engine = create_engine(f'sqlite:///{database_filepath}')
