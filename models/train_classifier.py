@@ -70,11 +70,11 @@ def build_model():
     
     
     parameters = {
-    'vect__max_df': [1, 3],
+    'vect__max_df': [1, 5],
     'tfidf__sublinear_tf': [True, False],
     'tfidf__use_idf': (True, False),
-    'clf__estimator__n_estimators' : [125, 250],
-    'clf__estimator__min_samples_leaf': [2,3]
+    'clf__estimator__n_estimators' : [250, 500],
+    'clf__estimator__min_samples_leaf': [2,4]
     }    
     cv = GridSearchCV(pipeline, param_grid=parameters, verbose=True)
     
