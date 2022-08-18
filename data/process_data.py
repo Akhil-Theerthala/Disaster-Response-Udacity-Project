@@ -27,7 +27,12 @@ def clean_data(df):
     #Removing the column names from the entries and changing the type to int
     for column in categories:
         categories[column] = [y for x,y in categories[column].str.split('-')]
-        categories[column] = categories[column].astype('Int64')
+        categories[column] = categories[column].astype('Int64')  
+    
+    # Check number not in (0,1) and update other value to 1
+    columns=(categories.max()>1)[categories.max()>1].index
+    for col in columns:
+        categories.loc[categories[col]>1,col] = 1
     
     #replacing the categories column with the new columns
     df.drop('categories', axis=1, inplace=True)
@@ -44,7 +49,7 @@ def clean_data(df):
 
 def save_data(df, database_filename):
     engine = create_engine(f'sqlite:///{database_filename}')
-    df.to_sql('Figure8Messages', engine, index=False)  
+    df.to_sql('Figure8Messages', engine, index=False,  if_exists='replace')  
 
 
 def main():

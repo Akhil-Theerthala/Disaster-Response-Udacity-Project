@@ -1,6 +1,7 @@
 import sys
 import sqlite3
 import pickle
+from unittest import result
 from sqlalchemy import create_engine
 
 import nltk
@@ -19,7 +20,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.metrics import classification_report, confusion_matrix, r2_score
+from sklearn.metrics import classification_report, confusion_matrix, r2_score, precision_recall_fscore_support
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.naive_bayes import MultinomialNB
 
@@ -41,13 +42,12 @@ def tokenize(text):
     tokens = word_tokenize(text)
     
     lemmatizer = WordNetLemmatizer()
-    stemmer = PorterStemmer()
     stop = stopwords.words('english')
     
     clean_tokens = []
     for token in tokens:
         if token not in stop:
-            clean_token = stemmer.stem(lemmatizer.lemmatize(token))
+            clean_token = lemmatizer.lemmatize(token)
             clean_tokens.append(clean_token)
 
     return clean_tokens
@@ -56,10 +56,14 @@ def display_results(y_test, y_pred):
     labels = np.unique(y_pred)
     confusion_mat = confusion_matrix(y_test, y_pred, labels=labels)
     accuracy = (y_pred == y_test).mean()
+    result=precision_recall_fscore_support(y_test, y_pred)
+    f1 = 2*(result[0][0]*result[1][1])/(result[0][1]+result[1][1])
 
     print("Labels:", labels)
-    print("Confusion Matrix:\n", confusion_mat)
     print("Accuracy:", accuracy)
+    print("f1:", f1)
+    print("Presicion:", result[0][0])
+    print("Recall:", result[1][0])
 
 def build_model():
     pipeline = Pipeline([
@@ -70,11 +74,11 @@ def build_model():
     
     
     parameters = {
-    'vect__max_df': [1, 5],
+    'vect__max_df': [1],
     'tfidf__sublinear_tf': [True, False],
     'tfidf__use_idf': (True, False),
-    'clf__estimator__n_estimators' : [250, 500],
-    'clf__estimator__min_samples_leaf': [2,4]
+    'clf__estimator__n_estimators' : [250],
+    'clf__estimator__min_samples_leaf': [4]
     }    
     cv = GridSearchCV(pipeline, param_grid=parameters, verbose=True)
     
