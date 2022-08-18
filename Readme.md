@@ -46,7 +46,7 @@ project
 |    |   classifier.pkl
 |    |   ML Pipeline Preparation.ipynb
 |    |   train_classifier.py
-
+```
 ---
 
 # 4.Instructions:
