@@ -13,7 +13,7 @@ from nltk.stem.porter import PorterStemmer
 import pandas as pd 
 import numpy as np
 import re
-
+import sklearn
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline, FeatureUnion
@@ -23,7 +23,7 @@ from sklearn.metrics import classification_report, confusion_matrix, r2_score
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.naive_bayes import MultinomialNB
 
-sklearn.ensemble.GradientBoostingClassifer(verbose=1)
+sklearn.ensemble.RandomForestClassifier(verbose=1)
 
 def load_data(database_filepath):
     engine = create_engine(f'sqlite:///{database_filepath}')
