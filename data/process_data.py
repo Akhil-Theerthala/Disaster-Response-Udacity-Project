@@ -2,15 +2,48 @@ import sys
 
 
 def load_data(messages_filepath, categories_filepath):
-    pass
+    messages = pd.read_csv(messages_filepath)
+    categories = pd.read_csv(categories_filepath)
+    
+    #Merging the dataframes
+    df = pd.concat([messages.set_index('id'), categories.set_index('id')], axis=1)
+    
+    return df
 
 
 def clean_data(df):
-    pass
+    # Filling null values in messages in the original column
+    df.original.fillna('-', inplace=True)
+    
+    #Seperating the categories into individual columns.
+    categories = df.categories.str.split(';', expand=True)
+    
+    #Getting the column names
+    row = categories.iloc[0,:]
+    category_colnames = [x for x,y in row.str.split('-')]
+    categories.columns = category_colnames
+    
+    #Removing the column names from the entries and changing the type to int
+    for column in categories:
+        categories[column] = [y for x,y in categories[column].str.split('-')]
+        categories[column] = categories[column].astype('Int64')
+    
+    #replacing the categories column with the new columns
+    df.drop('categories', axis=1, inplace=True)
+    df = pd.concat([df, categories], axis=1)
+    
+    # Dropping the duplicate entries
+    df.drop_duplicates(inplace=True)
+    
+    # remove any extra whitespace in message column
+    df['message'].replace(' +', ' ', inplace=True,regex=True)
+    
+    return df
 
 
 def save_data(df, database_filename):
-    pass  
+    engine = create_engine(f'sqlite:///{database_filename}')
+    df.to_sql('Figure8Messages', engine, index=False)  
 
 
 def main():
