@@ -3,6 +3,16 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    load_data
+    Loads data from csv files and returns a dataframe
+
+    input:
+         messages_filepath - Path of disaster_messages.csv
+        categories_filepath - Path of disaster_categories.csv
+    outputs:
+        df: dataframe to work with
+    '''
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     
@@ -13,6 +23,9 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    '''
+    Cleans the data by filling the null values, removing duplicates, converting the responses to binary etc.,
+    '''
     # Filling null values in messages in the original column
     df.original.fillna('-', inplace=True)
     
@@ -48,6 +61,13 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    '''
+    Saves the cleaned data into a table in a database
+
+    Inputs:
+    df - Cleaned dataframe that needs to be saved
+    database_filename: the path to the database in which the dataframe should be saved.
+    '''
     engine = create_engine(f'sqlite:///{database_filename}')
     df.to_sql('Figure8Messages', engine, index=False,  if_exists='replace')  
 

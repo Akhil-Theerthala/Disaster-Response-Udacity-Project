@@ -27,6 +27,17 @@ from sklearn.naive_bayes import MultinomialNB
 sklearn.ensemble.RandomForestClassifier(verbose=1)
 
 def load_data(database_filepath):
+    '''
+    load_data
+    Loads data from database and returns the features, targets, columns
+
+    input:
+         database name
+    outputs:
+        X: messages 
+        y: everything esle
+        category names.
+    '''
     engine = create_engine(f'sqlite:///{database_filepath}')
     df = pd.read_sql("SELECT * FROM Figure8Messages", engine)
     
@@ -37,7 +48,17 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
-    text =  re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
+    """
+    Normalize and tokenize input text
+
+    Inputs:
+    - text: Raw text which needs to tokenized and preprocessed for the model
+
+    Return:
+    clean_tokens: tokenized text which is normalized, lemmatized, and cleaned.
+
+    """
+    text =  re.sub(r"[^a-zA-Z0-9]", " ", text.casefold())
     
     tokens = word_tokenize(text)
     
@@ -52,20 +73,12 @@ def tokenize(text):
 
     return clean_tokens
 
-def display_results(y_test, y_pred):
-    labels = np.unique(y_pred)
-    confusion_mat = confusion_matrix(y_test, y_pred, labels=labels)
-    accuracy = (y_pred == y_test).mean()
-    result=precision_recall_fscore_support(y_test, y_pred)
-    f1 = 2*(result[0][0]*result[1][1])/(result[0][1]+result[1][1])
-
-    print("Labels:", labels)
-    print("Accuracy:", accuracy)
-    print("f1:", f1)
-    print("Presicion:", result[0][0])
-    print("Recall:", result[1][0])
 
 def build_model():
+    """
+    pipe line construction
+    """
+
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -84,8 +97,36 @@ def build_model():
     
     
     return cv
-    
+
+def display_results(y_test, y_pred):
+    '''
+    Display required metrics based on the predictions and targets. 
+    '''
+
+    labels = np.unique(y_pred)
+    confusion_mat = confusion_matrix(y_test, y_pred, labels=labels)
+    accuracy = (y_pred == y_test).mean()
+    result=precision_recall_fscore_support(y_test, y_pred)
+    f1 = 2*(result[0][0]*result[1][1])/(result[0][1]+result[1][1])
+
+    print("Labels:", labels)
+    print('------------')
+    print("Accuracy:", accuracy)
+    print("f1:", f1)
+    print("Presicion:", result[0][0])
+    print("Recall:", result[1][0])
+    print('\n')
+
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    inputs
+        model
+        X_test
+        y_test
+        category_names
+    output:
+        scores
+    """
     y_pred = model.predict(X_test)
     
     # display_results(y_test, y_pred)
@@ -97,6 +138,9 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+    Save the model into a pickle file.z
+    '''
     filename = model_filepath
     pickle.dump(model, open(filename, 'wb'))
 
